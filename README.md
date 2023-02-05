@@ -1,14 +1,14 @@
 
 Minimalistic HTTP Client Test Utilities.
 
-- Built on top of [reqwest](https://crates.io/crates/reqwest)
-- Still under development `0.0.x`
+- Built on top of [reqwest](https://crates.io/crates/reqwest).
+- Still under development `0.0.x`.
 - Optimized for testing convenience, not for performance.
 - Do not use for production code, just for unit or integration tests. 
 - For production code (apps, services, ...) use the underlying [reqwest](https://crates.io/crates/reqwest) library and its utilities.
 
 
-> WARNING - API might ching during `0.0.x`
+> WARNING - API might change during `0.0.x` development.
 
 ```rs
 use anyhow::Result;
@@ -54,6 +54,8 @@ async fn test_simple_base() -> httpc_test::Result<()> {
 		)
 		.await?;
 	res.print().await?;
+
+	// do_put_json, do_patch_json also available.
 
 
 	// Another post
