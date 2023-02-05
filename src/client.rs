@@ -32,11 +32,33 @@ impl Client {
 		self.capture_response(Method::GET, url, reqwest_res).await
 	}
 
+	pub async fn do_delete(&self, url: &str) -> Result<Response> {
+		let url = self.compose_url(url);
+		let reqwest_res = self.client.delete(&url).send().await?;
+		// capture the cookies at the time of the
+
+		self.capture_response(Method::DELETE, url, reqwest_res).await
+	}
+
 	pub async fn do_post_json(&self, url: &str, body: Value) -> Result<Response> {
+		self.do_push_json(Method::POST, url, body).await
+	}
+
+	pub async fn do_put_json(&self, url: &str, body: Value) -> Result<Response> {
+		self.do_push_json(Method::PUT, url, body).await
+	}
+
+	pub async fn do_patch_json(&self, url: &str, body: Value) -> Result<Response> {
+		self.do_push_json(Method::PATCH, url, body).await
+	}
+
+	// region:    --- Client Privates
+	/// Internal implementation for POST, PUT, PATCH
+	async fn do_push_json(&self, method: Method, url: &str, body: Value) -> Result<Response> {
 		let url = self.compose_url(url);
 		let reqwest_res = self.client.post(&url).json(&body).send().await?;
 
-		self.capture_response(Method::POST, url, reqwest_res).await
+		self.capture_response(method, url, reqwest_res).await
 	}
 
 	#[allow(clippy::await_holding_lock)] // ok for testing lib
@@ -68,6 +90,7 @@ impl Client {
 			None => url.to_string(),
 		}
 	}
+	// endregion: --- Client Privates
 }
 
 // region:    --- BaseUrl
