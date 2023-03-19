@@ -281,7 +281,7 @@ checksum = "d897f394bad6a705d5f4104762e116a75639e470d80901eed05a860a95cb1904"
 
 [[package]]
 name = "httpc-test"
-version = "0.0.2"
+version = "0.1.0-SNAPSHOT"
 dependencies = [
  "http",
  "reqwest",
