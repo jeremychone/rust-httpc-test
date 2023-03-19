@@ -34,7 +34,7 @@ async fn test_simple_base() -> httpc_test::Result<()> {
 	// In this case, server might do a Set-Cookie for the auth-token, 
 	// and the client cookie will be updated.
 	let res = hc
-		.do_post_json(
+		.do_post(
 			"/api/login",
 			json!({
 				"username": "admin",
@@ -46,7 +46,7 @@ async fn test_simple_base() -> httpc_test::Result<()> {
 
 	// Another post (with the cookie store updated from the login request above )
 	let res = hc
-		.do_post_json(
+		.do_post(
 			"/api/tickets",
 			json!({
 				"subject": "ticket 01"
@@ -55,7 +55,21 @@ async fn test_simple_base() -> httpc_test::Result<()> {
 		.await?;
 	res.print().await?;
 
-	// do_put_json, do_patch_json also available.
+
+	// Post with text content and specific content type
+	let res = hc
+		.do_post(
+			"/api/tickets",
+			(r#"{
+				"subject": "ticket bb"
+			}
+			"#, 
+			"application/json"),
+		)
+		.await?;
+	res.print().await?;
+
+	// Same woth do_patch, do_put.
 
 
 	// Another post
