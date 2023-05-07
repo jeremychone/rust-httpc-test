@@ -79,3 +79,6 @@ async fn test_simple_base() -> httpc_test::Result<()> {
 	Ok(())
 }
 ```
+
+<br /><br />
+[This GitHub repo](https://github.com/jeremychone/rust-httpc-test)
