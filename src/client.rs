@@ -2,6 +2,7 @@ use crate::cookie::Cookie;
 use crate::{Response, Result};
 use http::Method;
 use reqwest_cookie_store::CookieStoreMutex;
+use serde::de::DeserializeOwned;
 use serde_json::Value;
 use std::sync::Arc;
 
@@ -50,6 +51,27 @@ impl Client {
 
 	pub async fn do_patch(&self, url: &str, content: impl Into<PostContent>) -> Result<Response> {
 		self.do_push(Method::PUT, url, content.into()).await
+	}
+
+	//Typed stuff
+	pub async fn get<T>(&self, url: &str) -> Result<T> where T: DeserializeOwned {
+		self.do_get(url).await.and_then(|res| Ok(res.json_body_as::<T>()?))
+	}
+
+	pub async fn delete<T>(&self, url: &str) -> Result<T> where T: DeserializeOwned {
+		self.do_delete(url).await.and_then(|res| Ok(res.json_body_as::<T>()?))
+	}
+
+	pub async fn post<T>(&self, url: &str, content: impl Into<PostContent>) -> Result<T> where T: DeserializeOwned {
+		self.do_post(url, content).await.and_then(|res| Ok(res.json_body_as::<T>()?))
+	}
+
+	pub async fn put<T>(&self, url: &str, content: impl Into<PostContent>) -> Result<T> where T: DeserializeOwned {
+		self.do_put(url, content).await.and_then(|res| Ok(res.json_body_as::<T>()?))
+	}
+
+	pub async fn patch<T>(&self, url: &str, content: impl Into<PostContent>) -> Result<T> where T: DeserializeOwned {
+		self.do_patch(url, content).await.and_then(|res| Ok(res.json_body_as::<T>()?))
 	}
 
 	// region:    --- Client Privates

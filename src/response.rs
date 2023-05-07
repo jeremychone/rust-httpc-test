@@ -3,6 +3,7 @@ use crate::Result;
 use http::HeaderMap;
 use reqwest::{Method, StatusCode};
 use serde_json::{to_string_pretty, Value};
+use serde::de::DeserializeOwned;
 
 pub struct Response {
 	request_method: Method,
@@ -129,5 +130,27 @@ impl Response {
 
 		println!("===\n");
 		Ok(())
+	}
+
+	pub fn json_body(&self) -> Result<Value> {
+		match &self.body {
+			Body::Json(val) => Ok(val.clone()),
+			_ => Err(crate::Error::Static("No json body"))
+		}	
+	}
+
+	pub fn text_body(&self) -> Result<String> {
+		match &self.body {
+			Body::Text(val) => Ok(val.clone()),
+			_ => Err(crate::Error::Static("No text body"))
+		}	
+	}
+
+	pub fn json_body_as<T>(&self) -> Result<T> where T: DeserializeOwned {
+		self.json_body().and_then(|val| {
+			serde_json::from_value::<T>(val).map_err(|e| {
+				crate::Error::Generic(e.to_string())
+			})
+		})
 	}
 }
