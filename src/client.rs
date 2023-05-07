@@ -54,24 +54,39 @@ impl Client {
 	}
 
 	//Typed stuff
-	pub async fn get<T>(&self, url: &str) -> Result<T> where T: DeserializeOwned {
-		self.do_get(url).await.and_then(|res| Ok(res.json_body_as::<T>()?))
+	pub async fn get<T>(&self, url: &str) -> Result<T>
+	where
+		T: DeserializeOwned,
+	{
+		self.do_get(url).await.and_then(|res| res.json_body_as::<T>())
 	}
 
-	pub async fn delete<T>(&self, url: &str) -> Result<T> where T: DeserializeOwned {
-		self.do_delete(url).await.and_then(|res| Ok(res.json_body_as::<T>()?))
+	pub async fn delete<T>(&self, url: &str) -> Result<T>
+	where
+		T: DeserializeOwned,
+	{
+		self.do_delete(url).await.and_then(|res| res.json_body_as::<T>())
 	}
 
-	pub async fn post<T>(&self, url: &str, content: impl Into<PostContent>) -> Result<T> where T: DeserializeOwned {
-		self.do_post(url, content).await.and_then(|res| Ok(res.json_body_as::<T>()?))
+	pub async fn post<T>(&self, url: &str, content: impl Into<PostContent>) -> Result<T>
+	where
+		T: DeserializeOwned,
+	{
+		self.do_post(url, content).await.and_then(|res| res.json_body_as::<T>())
 	}
 
-	pub async fn put<T>(&self, url: &str, content: impl Into<PostContent>) -> Result<T> where T: DeserializeOwned {
-		self.do_put(url, content).await.and_then(|res| Ok(res.json_body_as::<T>()?))
+	pub async fn put<T>(&self, url: &str, content: impl Into<PostContent>) -> Result<T>
+	where
+		T: DeserializeOwned,
+	{
+		self.do_put(url, content).await.and_then(|res| res.json_body_as::<T>())
 	}
 
-	pub async fn patch<T>(&self, url: &str, content: impl Into<PostContent>) -> Result<T> where T: DeserializeOwned {
-		self.do_patch(url, content).await.and_then(|res| Ok(res.json_body_as::<T>()?))
+	pub async fn patch<T>(&self, url: &str, content: impl Into<PostContent>) -> Result<T>
+	where
+		T: DeserializeOwned,
+	{
+		self.do_patch(url, content).await.and_then(|res| res.json_body_as::<T>())
 	}
 
 	// region:    --- Client Privates
