@@ -1,4 +1,4 @@
-use crate::cookie::Cookie;
+use crate::cookie::{from_tower_cookie_deref, Cookie};
 use crate::{Response, Result};
 use http::Method;
 use reqwest_cookie_store::CookieStoreMutex;
@@ -25,6 +25,7 @@ pub fn new_client(base_url: impl Into<BaseUrl>) -> Result<Client> {
 }
 
 impl Client {
+	// region:    --- http calls returning httpc-test Response
 	pub async fn do_get(&self, url: &str) -> Result<Response> {
 		let url = self.compose_url(url);
 		let reqwest_res = self.client.get(&url).send().await?;
@@ -52,8 +53,9 @@ impl Client {
 	pub async fn do_patch(&self, url: &str, content: impl Into<PostContent>) -> Result<Response> {
 		self.do_push(Method::PUT, url, content.into()).await
 	}
+	// endregion: --- http calls returning httpc-test Response
 
-	//Typed stuff
+	// region:    --- http calls returning typed Deserialized body
 	pub async fn get<T>(&self, url: &str) -> Result<T>
 	where
 		T: DeserializeOwned,
@@ -88,6 +90,23 @@ impl Client {
 	{
 		self.do_patch(url, content).await.and_then(|res| res.json_body_as::<T>())
 	}
+	// endregion: --- http calls returning typed Deserialized body
+
+	// region:    --- Cookie
+	pub fn cookie(&self, name: &str) -> Option<Cookie> {
+		let cookie_store = self.cookie_store.lock().unwrap();
+		let cookie = cookie_store
+			.iter_any()
+			.find(|c| c.name() == name)
+			.map(|c| from_tower_cookie_deref(c));
+
+		cookie
+	}
+
+	pub fn cookie_value(&self, name: &str) -> Option<String> {
+		self.cookie(name).map(|c| c.value)
+	}
+	// endregion: --- Cookie
 
 	// region:    --- Client Privates
 
@@ -121,13 +140,7 @@ impl Client {
 		let cookie_store = self.cookie_store.lock().unwrap();
 
 		// Cookies from the client store
-		let client_cookies: Vec<Cookie> = cookie_store
-			.iter_any()
-			.map(|c| Cookie {
-				name: c.name().to_string(),
-				value: c.value().to_string(),
-			})
-			.collect();
+		let client_cookies: Vec<Cookie> = cookie_store.iter_any().map(|c| from_tower_cookie_deref(c)).collect();
 
 		Response::from_reqwest_response(request_method, url, client_cookies, reqwest_res).await
 	}

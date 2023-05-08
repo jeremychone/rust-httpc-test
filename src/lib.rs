@@ -5,6 +5,7 @@ mod response;
 
 // public re-exports
 pub type Result<T> = std::result::Result<T, error::Error>;
-pub use client::new_client;
-pub use error::Error;
-pub use response::Response;
+pub use crate::client::new_client;
+pub use crate::cookie::Cookie;
+pub use crate::error::Error;
+pub use crate::response::Response;

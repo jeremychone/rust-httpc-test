@@ -1,6 +1,6 @@
 [package]
 name = "httpc-test"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 authors = ["Jeremy Chone <jeremy.chone@gmail.com>"]
 license = "MIT OR Apache-2.0"
@@ -20,5 +20,6 @@ thiserror = "1"
 reqwest = {version = "0.11", features = ["cookies", "json"]}
 reqwest_cookie_store = "0.5"
 http = "0.2"
+cookie = "0.16" # Note: For now, do not update to 0.17 because some incompatibilities with cookie_store.
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
