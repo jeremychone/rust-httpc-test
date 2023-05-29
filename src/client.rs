@@ -29,16 +29,12 @@ impl Client {
 	pub async fn do_get(&self, url: &str) -> Result<Response> {
 		let url = self.compose_url(url);
 		let reqwest_res = self.client.get(&url).send().await?;
-		// capture the cookies at the time of the
-
 		self.capture_response(Method::GET, url, reqwest_res).await
 	}
 
 	pub async fn do_delete(&self, url: &str) -> Result<Response> {
 		let url = self.compose_url(url);
 		let reqwest_res = self.client.delete(&url).send().await?;
-		// capture the cookies at the time of the
-
 		self.capture_response(Method::DELETE, url, reqwest_res).await
 	}
 
@@ -51,7 +47,7 @@ impl Client {
 	}
 
 	pub async fn do_patch(&self, url: &str, content: impl Into<PostContent>) -> Result<Response> {
-		self.do_push(Method::PUT, url, content.into()).await
+		self.do_push(Method::PATCH, url, content.into()).await
 	}
 	// endregion: --- http calls returning httpc-test Response
 
