@@ -1,6 +1,7 @@
 # By Default, Ignore any .*, except .gitignore
 .*
 !.gitignore
+Cargo.lock
 
 # --- Rust
 target/
