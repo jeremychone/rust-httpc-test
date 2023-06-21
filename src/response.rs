@@ -44,18 +44,6 @@ fn get_status_color(status: &StatusCode) -> Color {
     }
 }
 
-// #[allow(unused)]
-// #[cfg(feature = "color-output")]
-// fn get_method_color(method: &Method) -> Color {
-//     match *method {
-//         Method::GET => Color::Blue,
-//         Method::POST => Color::Green,
-//         Method::PUT => Color::Yellow,
-//         Method::DELETE => Color::Red,
-//         _ => Color::White,
-//     }
-// }
-
 #[allow(unused)]
 #[cfg(feature = "color-output")]
 fn get_method_background(method: &Method) -> Color {
@@ -136,6 +124,10 @@ fn format_method(method: &Method) -> String {
     )
 }
 
+#[allow(unused)]
+#[cfg(feature = "color-output")]
+const INDENTATION: u8 = 12;
+
 impl Response {
     pub(crate) async fn from_reqwest_response(
         request_method: Method,
@@ -192,8 +184,8 @@ impl Response {
     }
 
     /// NOTE: For now, does not need to be async, but keeping the option of using async for later.
-    #[cfg(feature = "color-output")]
     #[allow(unused)]
+    #[cfg(feature = "color-output")]
     async fn inner_print(&self, body: bool) -> Result<()> {
         let method_color = get_method_color(&self.request_method);
         let method_background = get_method_background(&self.request_method);
@@ -201,7 +193,7 @@ impl Response {
         let status_color = get_status_color(&self.status);
         println!();
         println!(
-            "=== {} {}",
+            "{} {}",
             format_method(&self.request_method)
                 .bold()
                 .color(method_color)
@@ -209,7 +201,7 @@ impl Response {
             colored_url
         );
         println!(
-            "=> {:<15}: {} {}",
+            "{}: {} {}",
             "Status".blue(),
             self.status.as_str().bold().color(status_color).on_black(),
             self.status
@@ -219,14 +211,11 @@ impl Response {
         );
 
         // Print the response headers.
-        #[cfg(feature = "color-output")]
-        println!("=> {:<15}:", "Headers".blue());
-        #[cfg(not(feature = "color-output"))]
-        println!("=> {:<15}:", "Headers");
+        println!("{}:", "Headers".blue());
 
         for (n, v) in self.header_map.iter() {
             println!(
-                "   {}: {}",
+                "    {}: {}",
                 n.to_string().yellow(),
                 v.to_str().unwrap_or_default()
             );
@@ -234,31 +223,31 @@ impl Response {
 
         // Print the cookie_store
         if !self.cookies.is_empty() {
-            println!("=> {:<15}:", "Response Cookies".blue());
+            println!("{}:", "Response Cookies".blue());
             for c in self.cookies.iter() {
-                println!("   {}: {}", c.name.yellow(), c.value.bold());
+                println!("    {}: {}", c.name.yellow(), c.value.bold());
             }
         }
 
         // Print the cookie_store
         if !self.client_cookies.is_empty() {
-            println!("=> {:<15}:", "Client Cookies".bright_blue());
+            println!("{}:", "Client Cookies".blue());
             for c in self.client_cookies.iter() {
-                println!("   {}: {}", c.name.yellow(), c.value.bold());
+                println!("    {}: {}", c.name.yellow(), c.value.bold());
             }
         }
 
         if body {
             // Print the body (json pretty print if json type)
-            println!("=> {:<15}:", "Response Body".blue());
+            println!("{}:", "Response Body".blue());
             match &self.body {
                 Body::Json(val) => println!("{}", to_string_pretty(val)?.to_colored_json_auto()?),
-                Body::Text(val) => println!("{}", val.color(status_color)),
+                Body::Text(val) => println!("    {}", val.color(status_color)),
                 _ => (),
             }
         }
 
-        println!("===\n");
+        println!("\n");
         Ok(())
     }
 
