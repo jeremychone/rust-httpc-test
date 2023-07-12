@@ -44,7 +44,7 @@ impl Response {
 		// Capture the body
 		let ct = header_map.get("content-type").and_then(|v| v.to_str().ok());
 		let body = if let Some(ct) = ct {
-			if ct == "application/json" {
+			if ct.starts_with("application/json") {
 				Body::Json(res.json::<Value>().await?)
 			} else if ct.starts_with("text/") {
 				Body::Text(res.text().await?)
