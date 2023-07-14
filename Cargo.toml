@@ -13,6 +13,9 @@ keywords = [
 homepage = "https://github.com/jeremychone/rust-httpc-test"
 repository = "https://github.com/jeremychone/rust-httpc-test"
 
+[features]
+color-output = ["url", "colored_json", "colored"]
+
 [dependencies]
 tokio = { version = "1", features = ["full"] }
 thiserror = "1"
@@ -22,6 +25,18 @@ http = "0.2"
 cookie = "0.16" # Note: For now, do not update to 0.17 because some incompatibilities with cookie_store.
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+
+[dependencies.colored]
+version = "2.0.0"
+optional = true
+
+[dependencies.url]
+version = "2.4.0"
+optional = true
+
+[dependencies.colored_json]
+version = "3.2.0"
+optional = true
 
 [dev-dependencies]
 anyhow = "1"

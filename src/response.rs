@@ -5,6 +5,13 @@ use reqwest::{Method, StatusCode};
 use serde::de::DeserializeOwned;
 use serde_json::{to_string_pretty, Value};
 
+#[allow(unused)]
+#[cfg(feature = "color-output")]
+use colored::*;
+#[allow(unused)]
+#[cfg(feature = "color-output")]
+use colored_json::prelude::*;
+
 pub struct Response {
 	request_method: Method,
 	request_url: String,
@@ -24,6 +31,65 @@ enum Body {
 	Text(String),
 	Other,
 }
+
+#[allow(unused)]
+#[cfg(feature = "color-output")]
+fn get_status_color(status: &StatusCode) -> Color {
+	match status.as_u16() {
+		200..=299 => Color::Green,  // 2xx status codes are successful so we color them green
+		300..=399 => Color::Blue,   // 3xx status codes are for redirection so we color them blue
+		400..=499 => Color::Yellow, // 4xx status codes are client errors so we color them yellow
+		500..=599 => Color::Red,    // 5xx status codes are server errors so we color them red
+		_ => Color::White,          // Anything else we just color white
+	}
+}
+
+#[allow(unused)]
+#[cfg(feature = "color-output")]
+fn get_method_background(method: &Method) -> Color {
+	match *method {
+		Method::GET => Color::TrueColor { r: 223, g: 231, b: 238 },
+		Method::POST => Color::TrueColor { r: 220, g: 233, b: 228 },
+		Method::PUT => Color::TrueColor { r: 238, g: 229, b: 218 },
+		Method::DELETE => Color::TrueColor { r: 238, g: 219, b: 219 },
+		_ => Color::White,
+	}
+}
+
+#[allow(unused)]
+#[cfg(feature = "color-output")]
+fn get_method_color(method: &Method) -> Color {
+	match *method {
+		Method::GET => Color::TrueColor { r: 92, g: 166, b: 241 },
+		Method::POST => Color::TrueColor { r: 59, g: 184, b: 127 },
+		Method::PUT => Color::TrueColor { r: 239, g: 153, b: 46 },
+		Method::DELETE => Color::TrueColor { r: 236, g: 59, b: 59 },
+		_ => Color::White,
+	}
+}
+
+#[allow(unused)]
+#[cfg(feature = "color-output")]
+fn split_and_color_url(url: &str) -> String {
+	let url_struct = url::Url::parse(url).unwrap();
+	let path = url_struct.path();
+	format!("{}", path.purple())
+}
+
+#[allow(unused)]
+#[cfg(feature = "color-output")]
+fn format_method(method: &Method) -> String {
+	let method_str = format!("{}", method);
+	let width = 10;
+	let padding = width - method_str.len();
+	let pad_left = padding / 2;
+	let pad_right = padding - pad_left;
+	format!("{}{}{}", " ".repeat(pad_left), method_str, " ".repeat(pad_right))
+}
+
+#[allow(unused)]
+#[cfg(feature = "color-output")]
+const INDENTATION: u8 = 12;
 
 impl Response {
 	pub(crate) async fn from_reqwest_response(
@@ -78,14 +144,83 @@ impl Response {
 	}
 
 	/// NOTE: For now, does not need to be async, but keeping the option of using async for later.
+	#[allow(unused)]
+	#[cfg(feature = "color-output")]
+	async fn inner_print(&self, body: bool) -> Result<()> {
+		let method_color = get_method_color(&self.request_method);
+		let method_background = get_method_background(&self.request_method);
+		let colored_url = split_and_color_url(&self.request_url);
+		let status_color = get_status_color(&self.status);
+		println!();
+		println!(
+			"{} {}",
+			format_method(&self.request_method)
+				.bold()
+				.color(method_color)
+				.on_truecolor(50, 50, 50),
+			colored_url
+		);
+		println!(
+			"{}: {} {}",
+			"Status".blue(),
+			self.status.as_str().bold().color(status_color).on_black(),
+			self.status.canonical_reason().unwrap_or_default().color(status_color)
+		);
+
+		// Print the response headers.
+		println!("{}:", "Headers".blue());
+
+		for (n, v) in self.header_map.iter() {
+			println!("    {}: {}", n.to_string().yellow(), v.to_str().unwrap_or_default());
+		}
+
+		// Print the cookie_store
+		if !self.cookies.is_empty() {
+			println!("{}:", "Response Cookies".blue());
+			for c in self.cookies.iter() {
+				println!("    {}: {}", c.name.yellow(), c.value.bold());
+			}
+		}
+
+		// Print the cookie_store
+		if !self.client_cookies.is_empty() {
+			println!("{}:", "Client Cookies".blue());
+			for c in self.client_cookies.iter() {
+				println!("    {}: {}", c.name.yellow(), c.value.bold());
+			}
+		}
+
+		if body {
+			// Print the body (json pretty print if json type)
+			println!("{}:", "Response Body".blue());
+			match &self.body {
+				Body::Json(val) => println!("{}", to_string_pretty(val)?.to_colored_json_auto()?),
+				Body::Text(val) => println!("    {}", val.color(status_color)),
+				_ => (),
+			}
+		}
+
+		println!("\n");
+		Ok(())
+	}
+
+	#[cfg(not(feature = "color-output"))]
 	async fn inner_print(&self, body: bool) -> Result<()> {
 		println!();
-		println!("=== Response for {} {}", self.request_method, self.request_url);
-		println!("=> {:<15}: {}", "Status", self.status);
+		println!("=== Response for {} {}", self.request_method, &self.request_url);
+
+		println!(
+			"=> {:<15}: {} {}",
+			"Status",
+			self.status,
+			self.status.canonical_reason().unwrap_or_default()
+		);
+
 		// Print the response headers.
 		println!("=> {:<15}:", "Headers");
+
 		for (n, v) in self.header_map.iter() {
-			println!("   {n}: {v:?}");
+			println!("   {}: {}", n, v.to_str().unwrap_or_default());
 		}
 
 		// Print the cookie_store
@@ -109,7 +244,7 @@ impl Response {
 			println!("=> {:<15}:", "Response Body");
 			match &self.body {
 				Body::Json(val) => println!("{}", to_string_pretty(val)?),
-				Body::Text(val) => println!("{val}"),
+				Body::Text(val) => println!("{}", val),
 				_ => (),
 			}
 		}
@@ -117,6 +252,7 @@ impl Response {
 		println!("===\n");
 		Ok(())
 	}
+
 	// endregion: --- Print Methods
 
 	// region:    --- Headers
