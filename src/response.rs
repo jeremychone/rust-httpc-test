@@ -269,6 +269,13 @@ impl Response {
 	}
 	// endregion: --- Headers
 
+	// region:    --- Status Code
+	/// Return the Response status code
+	pub fn status(&self) -> StatusCode {
+		self.status
+	}
+	// endregion: --- Status Code
+
 	// region:    --- Response Cookie
 	/// Return the cookie that has been set for this http response.
 	pub fn res_cookie(&self, name: &str) -> Option<&Cookie> {
