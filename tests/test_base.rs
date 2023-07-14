@@ -1,5 +1,7 @@
 //! Note: http rest endpoints: https://sqa.stackexchange.com/questions/47097/free-sites-for-testing-post-rest-api-calls
 //!       Using: https://jsonplaceholder.typicode.com/
+//!
+//! Some is better than none: At this point very basic tests.
 
 use anyhow::Result;
 use serde_json::json;

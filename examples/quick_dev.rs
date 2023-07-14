@@ -12,7 +12,7 @@ async fn main() -> Result<()> {
 	let req = hc.do_get("/posts/1").await?;
 	req.print().await?;
 
-	let req = hc.do_get("/post/2").await?;
+	let req = hc.do_get("/todos/1").await?;
 	req.print().await?;
 
 	Ok(())

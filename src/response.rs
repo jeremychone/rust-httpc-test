@@ -79,12 +79,7 @@ fn split_and_color_url(url: &str) -> String {
 #[allow(unused)]
 #[cfg(feature = "color-output")]
 fn format_method(method: &Method) -> String {
-	let method_str = format!("{}", method);
-	let width = 10;
-	let padding = width - method_str.len();
-	let pad_left = padding / 2;
-	let pad_right = padding - pad_left;
-	format!("{}{}{}", " ".repeat(pad_left), method_str, " ".repeat(pad_right))
+	format!(" {:<10}", method.to_string())
 }
 
 #[allow(unused)]
@@ -153,7 +148,7 @@ impl Response {
 		let status_color = get_status_color(&self.status);
 		println!();
 		println!(
-			"{} {}",
+			"{}: {}",
 			format_method(&self.request_method)
 				.bold()
 				.color(method_color)
@@ -161,14 +156,14 @@ impl Response {
 			colored_url
 		);
 		println!(
-			"{}: {} {}",
+			" {:<9} : {} {}",
 			"Status".blue(),
 			self.status.as_str().bold().color(status_color).on_black(),
 			self.status.canonical_reason().unwrap_or_default().color(status_color)
 		);
 
 		// Print the response headers.
-		println!("{}:", "Headers".blue());
+		println!(" {:<9} :", "Headers".blue());
 
 		for (n, v) in self.header_map.iter() {
 			println!("    {}: {}", n.to_string().yellow(), v.to_str().unwrap_or_default());
@@ -176,7 +171,7 @@ impl Response {
 
 		// Print the cookie_store
 		if !self.cookies.is_empty() {
-			println!("{}:", "Response Cookies".blue());
+			println!(" {}:", "Response Cookies".blue());
 			for c in self.cookies.iter() {
 				println!("    {}: {}", c.name.yellow(), c.value.bold());
 			}
@@ -184,7 +179,7 @@ impl Response {
 
 		// Print the cookie_store
 		if !self.client_cookies.is_empty() {
-			println!("{}:", "Client Cookies".blue());
+			println!(" {}:", "Client Cookies".blue());
 			for c in self.client_cookies.iter() {
 				println!("    {}: {}", c.name.yellow(), c.value.bold());
 			}

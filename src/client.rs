@@ -192,7 +192,6 @@ impl From<(String, &'static str)> for PostContent {
 	}
 }
 
-/// Provides)
 impl From<(&str, &'static str)> for PostContent {
 	fn from((body, content_type): (&str, &'static str)) -> Self {
 		PostContent::Text {

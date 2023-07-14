@@ -8,7 +8,9 @@ Minimalistic HTTP Client Test Utilities.
 
 # Thanks
 
-- Thanks to [@defic](https://github.com/defic) for the type client `get/post/put/patch/delete` and the response `body...` apis.
+- Thanks to [@cyril-marpaud](https://github.com/cyril-marpaud) for the [PR #9 - feat: provide Response's StatusCode](https://github.com/jeremychone/rust-httpc-test/pull/9). 
+- Thanks to [@eboody](https://github.com/eboody) for the [PR #7 - Add colors to output](https://github.com/jeremychone/rust-httpc-test/pull/7) (enable with `features = ["color-output"]`)
+- Thanks to [@defic](https://github.com/defic) for the type client `get/post/put/patch/delete` and the response `body...` APIs.
 
 
 # Example
@@ -28,6 +30,7 @@ async fn test_simple_base() -> httpc_test::Result<()> {
 
 	// Simple do_get
 	let res = hc.do_get("/hello").await?; // httpc_test::Response 
+	let status = res.status();
 	// Pretty print the result (status, headers, response cookies, client cookies, body)
 	res.print().await?;
 
