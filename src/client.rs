@@ -107,22 +107,46 @@ impl Client {
 	// region:    --- Client Privates
 
 	/// Internal implementation for POST, PUT, PATCH
-	async fn do_push(&self, method: Method, url: &str, content: PostContent) -> Result<Response> {
-		let url = self.compose_url(url);
-		let reqwest_res = match content {
-			PostContent::Json(value) => self.client.post(&url).json(&value).send().await?,
-			PostContent::Text { content_type, body } => {
-				self.client
-					.post(&url)
-					.body(body)
-					.header("content-type", content_type)
-					.send()
-					.await?
-			}
-		};
+    async fn do_push(&self, method: Method, url: &str, content: PostContent) -> Result<Response> {
+        let url = self.compose_url(url);
+        let reqwest_res = match content {
+            PostContent::Json(value) => match method {
+                Method::POST => self.client.post(&url).json(&value).send().await?,
+                Method::PUT => self.client.put(&url).json(&value).send().await?,
+                Method::PATCH => self.client.patch(&url).json(&value).send().await?,
+                _ => panic!("Invalid method for do_push"),
+            },
+            PostContent::Text { content_type, body } => match method {
+                Method::POST => {
+                    self.client
+                        .post(&url)
+                        .body(body)
+                        .header("content-type", content_type)
+                        .send()
+                        .await?
+                }
+                Method::PUT => {
+                    self.client
+                        .put(&url)
+                        .body(body)
+                        .header("content-type", content_type)
+                        .send()
+                        .await?
+                }
+                Method::PATCH => {
+                    self.client
+                        .patch(&url)
+                        .body(body)
+                        .header("content-type", content_type)
+                        .send()
+                        .await?
+                }
+                _ => panic!("Invalid method for do_push"),
+            },
+        };
 
-		self.capture_response(method, url, reqwest_res).await
-	}
+        self.capture_response(method, url, reqwest_res).await
+    }
 
 	#[allow(clippy::await_holding_lock)] // ok for testing lib
 	async fn capture_response(
