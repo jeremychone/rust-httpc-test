@@ -8,8 +8,8 @@ use std::sync::Arc;
 
 pub struct Client {
 	base_url: Option<String>,
-	cookie_store: Arc<CookieStoreMutex>,
-	client: reqwest::Client,
+	pub cookie_store: Arc<CookieStoreMutex>,
+	pub client: reqwest::Client,
 }
 
 pub fn new_client(base_url: impl Into<BaseUrl>) -> Result<Client> {
