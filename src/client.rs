@@ -1,5 +1,5 @@
 use crate::cookie::{from_tower_cookie_deref, Cookie};
-use crate::{Response, Result};
+use crate::{Error, Response, Result};
 use http::Method;
 use reqwest_cookie_store::CookieStoreMutex;
 use serde::de::DeserializeOwned;
