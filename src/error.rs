@@ -1,3 +1,5 @@
+use http::Method;
+
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
 	#[error("Generic error: {0}")]
@@ -5,6 +7,9 @@ pub enum Error {
 
 	#[error("Static error: {0}")]
 	Static(&'static str),
+
+	#[error("Method not supported for client.do_push (only POST, PUSH, PATCH). Was: {given_method}")]
+	NotSupportedMethodForPush { given_method: Method },
 
 	#[error(transparent)]
 	IO(#[from] std::io::Error),

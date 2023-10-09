@@ -1,5 +1,5 @@
 use crate::cookie::{from_tower_cookie_deref, Cookie};
-use crate::{Response, Result};
+use crate::{Error, Response, Result};
 use http::Method;
 use reqwest_cookie_store::CookieStoreMutex;
 use serde::de::DeserializeOwned;
@@ -109,11 +109,14 @@ impl Client {
 	/// Internal implementation for POST, PUT, PATCH
 	async fn do_push(&self, method: Method, url: &str, content: PostContent) -> Result<Response> {
 		let url = self.compose_url(url);
+		if !matches!(method, Method::POST | Method::PUT | Method::PATCH) {
+			return Err(Error::NotSupportedMethodForPush { given_method: method });
+		}
 		let reqwest_res = match content {
-			PostContent::Json(value) => self.client.post(&url).json(&value).send().await?,
+			PostContent::Json(value) => self.client.request(method.clone(), &url).json(&value).send().await?,
 			PostContent::Text { content_type, body } => {
 				self.client
-					.post(&url)
+					.request(method.clone(), &url)
 					.body(body)
 					.header("content-type", content_type)
 					.send()
