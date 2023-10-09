@@ -9,18 +9,27 @@ use std::sync::Arc;
 pub struct Client {
 	base_url: Option<String>,
 	cookie_store: Arc<CookieStoreMutex>,
-	client: reqwest::Client,
+	reqwest_client: reqwest::Client,
+}
+
+impl Client {
+	pub fn cookie_store(&self) -> Arc<CookieStoreMutex> {
+		self.cookie_store.clone()
+	}
+	pub fn reqwest_client(&self) -> &reqwest::Client {
+		&self.reqwest_client
+	}
 }
 
 pub fn new_client(base_url: impl Into<BaseUrl>) -> Result<Client> {
 	let base_url = base_url.into().into();
 	let cookie_store = Arc::new(CookieStoreMutex::default());
-	let client = reqwest::Client::builder().cookie_provider(cookie_store.clone()).build()?;
+	let reqwest_client = reqwest::Client::builder().cookie_provider(cookie_store.clone()).build()?;
 
 	Ok(Client {
 		base_url,
 		cookie_store,
-		client,
+		reqwest_client,
 	})
 }
 
@@ -28,13 +37,13 @@ impl Client {
 	// region:    --- http calls returning httpc-test Response
 	pub async fn do_get(&self, url: &str) -> Result<Response> {
 		let url = self.compose_url(url);
-		let reqwest_res = self.client.get(&url).send().await?;
+		let reqwest_res = self.reqwest_client.get(&url).send().await?;
 		self.capture_response(Method::GET, url, reqwest_res).await
 	}
 
 	pub async fn do_delete(&self, url: &str) -> Result<Response> {
 		let url = self.compose_url(url);
-		let reqwest_res = self.client.delete(&url).send().await?;
+		let reqwest_res = self.reqwest_client.delete(&url).send().await?;
 		self.capture_response(Method::DELETE, url, reqwest_res).await
 	}
 
@@ -113,9 +122,9 @@ impl Client {
 			return Err(Error::NotSupportedMethodForPush { given_method: method });
 		}
 		let reqwest_res = match content {
-			PostContent::Json(value) => self.client.request(method.clone(), &url).json(&value).send().await?,
+			PostContent::Json(value) => self.reqwest_client.request(method.clone(), &url).json(&value).send().await?,
 			PostContent::Text { content_type, body } => {
-				self.client
+				self.reqwest_client
 					.request(method.clone(), &url)
 					.body(body)
 					.header("content-type", content_type)
