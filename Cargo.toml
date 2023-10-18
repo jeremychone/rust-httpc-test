@@ -22,7 +22,9 @@ thiserror = "1"
 reqwest = {version = "0.11", features = ["cookies", "json"]}
 reqwest_cookie_store = "0.6"
 http = "0.2"
-cookie = "0.17"
+# Note: It seems request_cookie_store doe snot support cookie 0.18
+#       So, sticking with 0.17 for now. 
+cookie = "0.17" 
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 
@@ -35,7 +37,7 @@ version = "2.4.0"
 optional = true
 
 [dependencies.colored_json]
-version = "3.2.0"
+version = "3.3"
 optional = true
 
 [dev-dependencies]
