@@ -1,6 +1,6 @@
 [package]
 name = "httpc-test"
-version = "0.1.7"
+version = "0.1.8-WIP"
 edition = "2021"
 authors = ["Jeremy Chone <jeremy.chone@gmail.com>"]
 license = "MIT OR Apache-2.0"
