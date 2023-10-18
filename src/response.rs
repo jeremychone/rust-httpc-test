@@ -1,5 +1,5 @@
 use crate::cookie::Cookie;
-use crate::Result;
+use crate::{Error, Result};
 use http::HeaderMap;
 use reqwest::{Method, StatusCode};
 use serde::de::DeserializeOwned;
@@ -303,15 +303,30 @@ impl Response {
 	pub fn json_body(&self) -> Result<Value> {
 		match &self.body {
 			Body::Json(val) => Ok(val.clone()),
-			_ => Err(crate::Error::Static("No json body")),
+			_ => Err(Error::Static("No json body")),
 		}
 	}
 
 	pub fn text_body(&self) -> Result<String> {
 		match &self.body {
 			Body::Text(val) => Ok(val.clone()),
-			_ => Err(crate::Error::Static("No text body")),
+			_ => Err(Error::Static("No text body")),
 		}
+	}
+
+	pub fn json_value<T>(&self, pointer: &str) -> Result<T>
+	where
+		T: DeserializeOwned,
+	{
+		let Body::Json(body) = &self.body else {
+			return Err(Error::Static("No json body"));
+		};
+
+		let value = body.pointer("/result/id").ok_or_else(|| Error::NoJsonValueFound {
+			json_pointer: pointer.to_string(),
+		})?;
+
+		Ok(serde_json::from_value::<T>(value.clone())?)
 	}
 
 	pub fn json_body_as<T>(&self) -> Result<T>
@@ -319,7 +334,7 @@ impl Response {
 		T: DeserializeOwned,
 	{
 		self.json_body()
-			.and_then(|val| serde_json::from_value::<T>(val).map_err(|e| crate::Error::Generic(e.to_string())))
+			.and_then(|val| serde_json::from_value::<T>(val).map_err(Error::SerdeJson))
 	}
 	// endregion: --- Body
 }

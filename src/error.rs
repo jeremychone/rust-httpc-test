@@ -11,6 +11,9 @@ pub enum Error {
 	#[error("Method not supported for client.do_push (only POST, PUSH, PATCH). Was: {given_method}")]
 	NotSupportedMethodForPush { given_method: Method },
 
+	#[error("Not Json value at json pointer: {json_pointer}")]
+	NoJsonValueFound { json_pointer: String },
+
 	#[error(transparent)]
 	IO(#[from] std::io::Error),
 
