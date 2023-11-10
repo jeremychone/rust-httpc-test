@@ -22,9 +22,20 @@ impl Client {
 }
 
 pub fn new_client(base_url: impl Into<BaseUrl>) -> Result<Client> {
+	let reqwest_builder = reqwest::Client::builder();
+
+	new_client_with_reqwest(base_url, reqwest_builder)
+}
+
+pub fn new_client_with_reqwest(
+	base_url: impl Into<BaseUrl>,
+	reqwest_builder: reqwest::ClientBuilder,
+) -> Result<Client> {
 	let base_url = base_url.into().into();
 	let cookie_store = Arc::new(CookieStoreMutex::default());
-	let reqwest_client = reqwest::Client::builder().cookie_provider(cookie_store.clone()).build()?;
+	let reqwest_client = reqwest_builder
+		.cookie_provider(cookie_store.clone())
+		.build()?;
 
 	Ok(Client {
 		base_url,
