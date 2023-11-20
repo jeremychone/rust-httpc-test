@@ -8,6 +8,10 @@ Minimalistic HTTP Client Test Utilities.
 
 # Thanks
 
+- Thanks to [@Manubi](https://github.com/Manubi) for the `colored_json` update.
+- Thanks to [@JamesGuthrie](https://github.com/JamesGuthrie) for 
+	- [PR #17 + Allow building client with custom reqwest::ClientBuilder](https://github.com/jeremychone/rust-httpc-test/pull/17)
+	- [PR #16 + Make rustc_http::Client public](https://github.com/jeremychone/rust-httpc-test/pull/16)
 - Thanks to [@cyril-marpaud](https://github.com/cyril-marpaud) for the [PR #9 - feat: provide Response's StatusCode](https://github.com/jeremychone/rust-httpc-test/pull/9). 
 - Thanks to [@eboody](https://github.com/eboody) for the [PR #7 - Add colors to output](https://github.com/jeremychone/rust-httpc-test/pull/7) (enable with `features = ["color-output"]`)
 - Thanks to [@defic](https://github.com/defic) for the type client `get/post/put/patch/delete` and the response `body...` APIs.
