@@ -1,4 +1,4 @@
-use http::Method;
+use reqwest::Method;
 
 #[derive(thiserror::Error, Debug)]
 pub enum Error {

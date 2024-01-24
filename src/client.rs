@@ -1,6 +1,6 @@
 use crate::cookie::{from_tower_cookie_deref, Cookie};
 use crate::{Error, Response, Result};
-use http::Method;
+use reqwest::Method;
 use reqwest_cookie_store::CookieStoreMutex;
 use serde::de::DeserializeOwned;
 use serde_json::Value;
@@ -33,9 +33,7 @@ pub fn new_client_with_reqwest(
 ) -> Result<Client> {
 	let base_url = base_url.into().into();
 	let cookie_store = Arc::new(CookieStoreMutex::default());
-	let reqwest_client = reqwest_builder
-		.cookie_provider(cookie_store.clone())
-		.build()?;
+	let reqwest_client = reqwest_builder.cookie_provider(cookie_store.clone()).build()?;
 
 	Ok(Client {
 		base_url,

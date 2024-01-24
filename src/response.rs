@@ -1,6 +1,5 @@
 use crate::cookie::Cookie;
 use crate::{Error, Result};
-use http::HeaderMap;
 use reqwest::{Method, StatusCode};
 use serde::de::DeserializeOwned;
 use serde_json::{to_string_pretty, Value};
@@ -11,6 +10,7 @@ use colored::*;
 #[allow(unused)]
 #[cfg(feature = "color-output")]
 use colored_json::prelude::*;
+use reqwest::header::HeaderMap;
 
 pub struct Response {
 	request_method: Method,
