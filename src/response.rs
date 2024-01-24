@@ -322,7 +322,7 @@ impl Response {
 			return Err(Error::Static("No json body"));
 		};
 
-		let value = body.pointer("/result/id").ok_or_else(|| Error::NoJsonValueFound {
+		let value = body.pointer(pointer).ok_or_else(|| Error::NoJsonValueFound {
 			json_pointer: pointer.to_string(),
 		})?;
 
