@@ -207,7 +207,7 @@ impl Response {
 		println!(
 			"=> {:<15}: {} {}",
 			"Status",
-			self.status,
+			self.status.as_str(),
 			self.status.canonical_reason().unwrap_or_default()
 		);
 
