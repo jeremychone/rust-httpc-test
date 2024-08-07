@@ -8,6 +8,7 @@ Minimalistic HTTP Client Test Utilities.
 
 # Thanks
 
+- Thanks to [@joeftiger](https://github.com/joeftiger) for dependencies update (#23)
 - Thanks to [@Manubi](https://github.com/Manubi) for the `colored_json` update.
 - Thanks to [@JamesGuthrie](https://github.com/JamesGuthrie) for 
 	- [PR #17 + Allow building client with custom reqwest::ClientBuilder](https://github.com/jeremychone/rust-httpc-test/pull/17)
