@@ -78,7 +78,7 @@ async fn test_simple_base() -> httpc_test::Result<()> {
 		.await?;
 	res.print().await?;
 
-	// Same woth do_patch, do_put.
+	// Same with do_patch, do_put.
 
 
 	Ok(())
