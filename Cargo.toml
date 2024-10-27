@@ -1,6 +1,6 @@
 [package]
 name = "httpc-test"
-version = "0.1.10"
+version = "0.1.11"
 edition = "2021"
 authors = ["Jeremy Chone <jeremy.chone@gmail.com>"]
 license = "MIT OR Apache-2.0"
@@ -19,7 +19,7 @@ color-output = ["url", "colored_json", "colored"]
 [dependencies]
 tokio = { version = "1", features = ["full"] }
 thiserror = "1"
-reqwest = {version = "0.12", features = ["cookies", "json"]}
+reqwest = {version = "0.12", features = ["cookies", "json", "default-tls"]}
 reqwest_cookie_store = "0.8"
 cookie = "0.18"
 serde = { version = "1", features = ["derive"] }

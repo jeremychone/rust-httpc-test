@@ -27,6 +27,21 @@ pub fn new_client(base_url: impl Into<BaseUrl>) -> Result<Client> {
 	new_client_with_reqwest(base_url, reqwest_builder)
 }
 
+/// Create a configurable `httpc_test::Client` by passing a non default `reqwest::ClientBuilder`.
+///
+/// # Example
+///
+/// ```
+///    use httpc_test::ClientBuilder;
+///    // Create a new httpc_test::Client, that can interact with
+///    // servers that use self-signed certificates (e.g. for local development).
+///    let client_builder = ClientBuilder::new()
+///        .danger_accept_invalid_certs(true)
+///        .danger_accept_invalid_hostnames(true)
+///        .https_only(true);
+///    let hc = httpc_test::new_client_with_reqwest("https://localhost:8080", client_builder)
+///        .expect("httpc_test::new_client_with_reqwest() failed");
+/// ```
 pub fn new_client_with_reqwest(
 	base_url: impl Into<BaseUrl>,
 	reqwest_builder: reqwest::ClientBuilder,

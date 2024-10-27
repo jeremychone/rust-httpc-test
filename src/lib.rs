@@ -11,3 +11,4 @@ pub use crate::client::Client;
 pub use crate::cookie::Cookie;
 pub use crate::error::Error;
 pub use crate::response::Response;
+pub use reqwest::ClientBuilder;
