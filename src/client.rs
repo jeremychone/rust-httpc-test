@@ -10,6 +10,7 @@ pub struct Client {
 	base_url: Option<String>,
 	cookie_store: Arc<CookieStoreMutex>,
 	reqwest_client: reqwest::Client,
+	bearer_token: Option<String>,
 }
 
 impl Client {
@@ -39,20 +40,35 @@ pub fn new_client_with_reqwest(
 		base_url,
 		cookie_store,
 		reqwest_client,
+		bearer_token: None,
 	})
 }
 
 impl Client {
+
+	pub fn bearer_auth(mut self, token: impl ToString) -> Self {
+		self.bearer_token = Some(token.to_string());
+		self
+	}
+
 	// region:    --- http calls returning httpc-test Response
 	pub async fn do_get(&self, url: &str) -> Result<Response> {
 		let url = self.compose_url(url);
-		let reqwest_res = self.reqwest_client.get(&url).send().await?;
+		let mut request = self.reqwest_client.get(&url);
+		if let Some(token) = &self.bearer_token {
+				request = request.bearer_auth(token);
+		}
+		let reqwest_res = request.send().await?;
 		self.capture_response(Method::GET, url, reqwest_res).await
 	}
 
 	pub async fn do_delete(&self, url: &str) -> Result<Response> {
 		let url = self.compose_url(url);
-		let reqwest_res = self.reqwest_client.delete(&url).send().await?;
+		let mut request = self.reqwest_client.delete(&url);
+		if let Some(token) = &self.bearer_token {
+				request = request.bearer_auth(token);
+		}
+		let reqwest_res = request.send().await?;
 		self.capture_response(Method::DELETE, url, reqwest_res).await
 	}
 
@@ -130,18 +146,20 @@ impl Client {
 		if !matches!(method, Method::POST | Method::PUT | Method::PATCH) {
 			return Err(Error::NotSupportedMethodForPush { given_method: method });
 		}
+		let mut request = self.reqwest_client.request(method.clone(), &url);
+		if let Some(token) = &self.bearer_token {
+			request = request.bearer_auth(token);
+		}
 		let reqwest_res = match content {
-			PostContent::Json(value) => self.reqwest_client.request(method.clone(), &url).json(&value).send().await?,
+			PostContent::Json(value) => { request.json(&value).send().await? }
 			PostContent::Text { content_type, body } => {
-				self.reqwest_client
-					.request(method.clone(), &url)
+				request
 					.body(body)
 					.header("content-type", content_type)
 					.send()
 					.await?
 			}
 		};
-
 		self.capture_response(method, url, reqwest_res).await
 	}
 
